@@ -1,8 +1,27 @@
 
 // Constants
-// TODO: get constants from geogebra
-const lambda = 1;
+const nSpalte = ggbApplet.getValue('SpaltAnzahl')
+const spaltBreite = ggbApplet.getValue('SpaltBreite')
+const spaltAbstand = ggbApplet.getValue('Spaltabstand')
+const punkteProSpalt = ggbApplet.getValue('StartpunkteProSpalt')
+const lambda = ggbApplet.getValue('lambda')
+const dist = ggbApplet.getValue('Distanz')
+const schirmbreite = ggbApplet.getValue('Schirmbreite')
+const nA = ggbApplet.getValue('LichtWegpunkte')
+const precision = ggbApplet.getValue('CornuspiraleGenauigkeit')
 
+function drawPointArray(points, listName) {
+	let cmd = listName + '={';
+	points.forEach(p => cmd += `(${p.x},${p.y}),`);
+	let tmp = cmd.split('');
+	tmp.pop();
+	cmd = tmp.join('');
+	cmd += '}';
+	ggbApplet.evalCommand(cmd);
+	ggbApplet.setVisible(listName, true);
+}
+
+// 2D Vector class
 class vec2 {
 	// Coordinates:
 	x;
@@ -40,6 +59,17 @@ class vec2 {
 	}
 }
 
+function drawGitter() {
+	let points = [];
+	for(let i = 0; i < nSpalte; ++i) {
+		const breite = schirmbreite - 2 * spaltAbstand - spaltBreite;
+		const spaltH = -breite / 2 + i * breite / nSpalte;
+		points.push({ x: 0, y: spaltH + spaltBreite/2});
+		points.push({ x: 0, y: spaltH + spaltBreite/2});
+	}
+}
+
+
 
 // calculates the total distance travelled from v1 to v2 to v3
 const totalDist = (v1, v2, v3) => ( vec2.dist(v1, v2) + vec2.dist(v2, v3) );
@@ -52,7 +82,3 @@ function getAlpha(s, a, z) {
 	// dLambda / lambda = alpha / 2PI
 	return ( 2 * Math.PI * dLambda / lambda )
 }
-
-
-const v = new vec2(1, 0);
-console.log(v.rotate(2 * Math.PI))
