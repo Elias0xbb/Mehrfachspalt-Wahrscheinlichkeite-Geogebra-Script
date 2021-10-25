@@ -10,7 +10,8 @@ const schirmbreite = ggbApplet.getValue('Schirmbreite')
 const nA = ggbApplet.getValue('LichtWegpunkte')
 const precision = ggbApplet.getValue('CornuspiraleGenauigkeit')
 
-function drawPointArray(points, listName) {
+// draws an array of points in geogebra
+function drawPointArray(points, listName, visibility = false) {
 	let cmd = listName + '={';
 	points.forEach(p => cmd += `(${p.x},${p.y}),`);
 	let tmp = cmd.split('');
@@ -18,7 +19,7 @@ function drawPointArray(points, listName) {
 	cmd = tmp.join('');
 	cmd += '}';
 	ggbApplet.evalCommand(cmd);
-	ggbApplet.setVisible(listName, true);
+	ggbApplet.setVisible(listName, visibility);
 }
 
 // 2D Vector class
@@ -61,12 +62,34 @@ class vec2 {
 
 function drawGitter() {
 	let points = [];
-	for(let i = 0; i < nSpalte; ++i) {
-		const breite = schirmbreite - 2 * spaltAbstand - spaltBreite;
-		const spaltH = -breite / 2 + i * breite / nSpalte;
-		points.push({ x: 0, y: spaltH + spaltBreite/2});
-		points.push({ x: 0, y: spaltH + spaltBreite/2});
+	
+	// Delete old gitter
+	ggbApplet.evalCommand('Delete(gitter)');
+	ggbApplet.evalCommand('Delete(giterStrecken)');
+
+	// Draw points for the gitter
+	const gitterBreite = nSpalte * spaltBreite + nSpalte * spaltAbstand + spaltAbstand;
+	let height = gitterBreite / 2;
+
+	for(let i = 0; i < nSpalte+1; ++i) {
+		points.push({ x: 0, y: height });
+		height -= spaltAbstand;
+		points.push({ x: 0, y: height });
+		height -= spaltBreite;
 	}
+
+	drawPointArray(points, 'gitter');
+
+	let cmd = 'gitterStrecken={';
+	// draw the lines between the points
+	for(let i = 0; i < points.length; i+=2) {
+		cmd += `Segment(gitter(${i+1}),gitter(${i+2})),`;
+	}
+	let tmp = cmd.split('');
+	tmp.pop();
+	cmd = tmp.join('');
+	cmd+= '}';
+	ggbApplet.evalCommand(cmd);
 }
 
 
