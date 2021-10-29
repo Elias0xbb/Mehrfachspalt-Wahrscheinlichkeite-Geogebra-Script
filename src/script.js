@@ -62,10 +62,11 @@ class vec2 {
 
 function drawGitter() {
 	let points = [];
+	let lightSrcPoints = [];
 	
 	// Delete old gitter
-	ggbApplet.evalCommand('Delete(gitter)');
-	ggbApplet.evalCommand('Delete(giterStrecken)');
+	// ggbApplet.evalCommand('Delete(gitter)');
+	// ggbApplet.evalCommand('Delete(gitterStrecken)');
 
 	// Draw points for the gitter
 	const gitterBreite = nSpalte * spaltBreite + nSpalte * spaltAbstand + spaltAbstand;
@@ -75,10 +76,19 @@ function drawGitter() {
 		points.push({ x: 0, y: height });
 		height -= spaltAbstand;
 		points.push({ x: 0, y: height });
+		// save the light source points
+		if(punkteProSpalt === 1) {
+			lightSrcPoints.push({ x: 0, y: height - spaltBreite/2 });
+		} else {
+			for(let n = 0; n < punkteProSpalt; ++n) {
+				lightSrcPoints.push({ x: 0, y: height - n * spaltBreite / (punkteProSpalt - 1) });
+			}
+		}
 		height -= spaltBreite;
 	}
 
 	drawPointArray(points, 'gitter');
+	// drawPointArray(lightSrcPoints, 'lichtquellen');
 
 	let cmd = 'gitterStrecken={';
 	// draw the lines between the points
@@ -105,3 +115,6 @@ function getAlpha(s, a, z) {
 	// dLambda / lambda = alpha / 2PI
 	return ( 2 * Math.PI * dLambda / lambda )
 }
+
+// execute functions:
+drawGitter();
